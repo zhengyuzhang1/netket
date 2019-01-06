@@ -73,7 +73,7 @@ class VariationalMonteCarlo {
   int mynode_;
 
   // This optional will contain a value iff the MPI rank is 0.
-  nonstd::optional<JsonOutputWriter> output_;
+  std::optional<JsonOutputWriter> output_;
 
   Optimizer &opt_;
 

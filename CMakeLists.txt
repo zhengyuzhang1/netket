@@ -12,7 +12,7 @@ endif()
 
 include(ExternalProject)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules/)
@@ -23,25 +23,25 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules/)
 
 # json
 ################################################################################
-if (NOT EXISTS "${CMAKE_BINARY_DIR}/External/json/json.hpp")
-    file(DOWNLOAD
-        "https://github.com/nlohmann/json/releases/download/v3.2.0/json.hpp"
-        "External/json/json.hpp")
-endif()
+#if (NOT EXISTS "${CMAKE_BINARY_DIR}/External/json/json.hpp")
+#    file(DOWNLOAD
+#        "https://github.com/nlohmann/json/releases/download/v3.2.0/json.hpp"
+#        "External/json/json.hpp")
+#endif()
 add_library(nlohmann_json INTERFACE)
 target_include_directories(nlohmann_json
-    INTERFACE "${CMAKE_BINARY_DIR}/External/json")
+    INTERFACE "/usr/include/nlohmann")
 
 # optional-lite
 ################################################################################
-if (NOT EXISTS "${CMAKE_BINARY_DIR}/External/optional-lite/nonstd/optional.hpp")
-    file(DOWNLOAD
-        "https://raw.githubusercontent.com/martinmoene/optional-lite/e240fdaaa4071a980926dea4ed5b610aa8fbc538/include/nonstd/optional.hpp"
-        "External/optional-lite/nonstd/optional.hpp")
-endif()
-add_library(optional_lite INTERFACE)
-target_include_directories(optional_lite
-    INTERFACE "${CMAKE_BINARY_DIR}/External/optional-lite")
+#if (NOT EXISTS "${CMAKE_BINARY_DIR}/External/optional-lite/nonstd/optional.hpp")
+#    file(DOWNLOAD
+#        "https://raw.githubusercontent.com/martinmoene/optional-lite/e240fdaaa4071a980926dea4ed5b610aa8fbc538/include/nonstd/optional.hpp"
+#        "External/optional-lite/nonstd/optional.hpp")
+#endif()
+#add_library(optional_lite INTERFACE)
+#target_include_directories(optional_lite
+#    INTERFACE "${CMAKE_BINARY_DIR}/External/optional-lite")
 
 
 # span-lite
@@ -58,18 +58,8 @@ target_include_directories(span_lite
 
 # Eigen3
 ################################################################################
-ExternalProject_Add(
-    eigen_project
-    SOURCE_DIR "${CMAKE_BINARY_DIR}/External/Eigen3"
-    URL "https://github.com/eigenteam/eigen-git-mirror/archive/3.3.5.tar.gz"
-    URL_HASH MD5=305eed19157335016bde9b4d57ee3d35
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
-    INSTALL_COMMAND ""
-)
-ExternalProject_Get_Property(eigen_project SOURCE_DIR)
 add_library(Eigen3 INTERFACE)
-target_include_directories(Eigen3 SYSTEM INTERFACE ${SOURCE_DIR})
+target_include_directories(Eigen3 SYSTEM INTERFACE "/usr/include/eigen3")
 
 # IETL
 ################################################################################
@@ -84,14 +74,9 @@ find_package(MPI REQUIRED)
 # Catch2
 ################################################################################
 if (BUILD_TESTING)
-    if (NOT EXISTS "${CMAKE_BINARY_DIR}/External/Catch2/catch2/catch.hpp")
-        file(DOWNLOAD
-            "https://github.com/catchorg/Catch2/releases/download/v2.4.0/catch.hpp"
-            "External/Catch2/catch2/catch.hpp")
-    endif()
     add_library(Catch2 INTERFACE)
     target_include_directories(Catch2
-        INTERFACE "${CMAKE_BINARY_DIR}/External/Catch2/catch2")
+        INTERFACE "/usr/include/catch2")
 endif()
 
 #
@@ -141,13 +126,13 @@ target_link_libraries(netket_lib
         ${MPI_CXX_LIBRARIES}
         Eigen3
         nlohmann_json
-        optional_lite
+        #optional_lite
         span_lite
         IETL
 )
 
 # Check if we should use native Lapack with Eigen
-option(USE_LAPACK "Enable Lapack Support." OFF)
+option(USE_LAPACK "Enable Lapack Support." ON)
 if(USE_LAPACK)
     find_package(LAPACK REQUIRED)
     add_definitions(-DEIGEN_USE_BLAS)
@@ -165,7 +150,7 @@ add_executable(netket NetKet/netket.cc)
 target_link_libraries(netket PUBLIC netket_lib)
 # Yes, this is ugly, but until CMake 3.5, we can't add an external project
 # dependency to an interface library
-add_dependencies(netket eigen_project)
+#add_dependencies(netket eigen_project)
 
 #
 # Testing

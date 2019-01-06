@@ -4,7 +4,7 @@
 #include <cassert>
 #include <fstream>
 
-#include <nonstd/optional.hpp>
+//#include <nonstd/optional.hpp>
 
 #include "Machine/abstract_machine.hpp"
 #include "Stats/obs_manager.hpp"
@@ -61,7 +61,7 @@ class JsonOutputWriter {
    * in the log.
    */
   void WriteLog(int iteration, const json& observable_data,
-                nonstd::optional<double> time = nonstd::nullopt) {
+                std::optional<double> time = std::nullopt) {
     json data = observable_data;
     data["Iteration"] = iteration;
     if (time.has_value()) {
